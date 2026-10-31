@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>도란이</title>
+<script>
+  // ▼▼▼ 설치할 때 아래 따옴표 안만 바꾸세요: Apps Script 웹 앱 주소 ▼▼▼
+  const API_URL = "https://script.google.com/macros/s/AKfycbyTbzZbi5BUg29Hn9StQStqx2unXtDKAyCJQ3sDop3VJlatuxj5SScEhhzPoP_E6Wjk/exec";
+</script>
+<style>
+  :root{
+    --bg:#FFF8EC; --card:#FFFFFF; --ink:#3B2F2A; --muted:#8A7A70;
+    --accent:#FF8A3D; --accent-ink:#FFFFFF; --listen:#E8463A; --think:#5B8DEF; --line:#EADFCF;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    display:flex;align-items:center;justify-content:center;padding:16px}
+  .screen{display:none;width:100%;max-width:720px;text-align:center}
+  .screen.on{display:block}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:24px}
+  h1{font-size:28px;margin:0 0 16px}
+  label{display:block;text-align:left;font-size:16px;margin:14px 0 6px;color:var(--muted)}
+  input,select{width:100%;font-size:22px;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+  .btn{display:inline-block;border:0;border-radius:16px;padding:16px 28px;font-size:22px;font-weight:700;cursor:pointer;
+    background:var(--accent);color:var(--accent-ink);margin-top:20px}
+  .btn.ghost{background:transparent;color:var(--muted);font-size:15px;font-weight:400;padding:8px 12px;margin-top:12px;border:1px solid var(--line)}
+  .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .warn{color:#B3261E;font-size:15px;margin-top:12px;min-height:1em}
+  .doran{width:min(42vw,220px);height:auto;display:block;margin:0 auto}
+  .bubble{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:18px 20px;font-size:clamp(22px,4.2vw,30px);
+    line-height:1.45;min-height:3.2em;margin:16px auto;max-width:640px;word-break:keep-all}
+  .status{font-size:20px;color:var(--muted);min-height:1.4em;margin:6px 0}
+  .mic{width:min(38vw,180px);height:min(38vw,180px);border-radius:50%;border:0;background:var(--accent);color:#fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;margin:10px auto 0;box-shadow:0 6px 0 rgba(0,0,0,.12)}
+  .mic svg{width:45%;height:45%}
+  .mic.listening{background:var(--listen);animation:pulse 1.2s infinite}
+  .mic:disabled{background:#CFC6BC;box-shadow:none;cursor:default;animation:none}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,70,58,.5)}70%{box-shadow:0 0 0 22px rgba(232,70,58,0)}100%{box-shadow:0 0 0 0 rgba(232,70,58,0)}}
+  .miclabel{font-size:20px;margin-top:10px;color:var(--muted)}
+  .corner{position:fixed;right:10px;bottom:8px;font-size:12px;color:var(--muted);background:transparent;border:0;opacity:.6}
+  .typebox{display:none;margin-top:12px}
+  .typebox.on{display:flex;gap:8px}
+  .typebox input{font-size:18px}
+  .typebox button{font-size:18px;padding:10px 16px;border-radius:12px;border:0;background:var(--think);color:#fff}
+  .endtitle{font-size:clamp(28px,5vw,40px);font-weight:800;margin:10px 0}
+  .small{font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- 1. 교사 준비 화면 -->
+<section id="setup" class="screen on">
+  <div class="card">
+    <h1>도란이 준비 (선생님)</h1>
+    <label for="student">학생 번호</label>
+    <input id="student" type="number" min="0" inputmode="numeric" placeholder="예: 7  (0번 = 시험용)">
+    <label for="code">선생님 비밀번호</label>
+    <input id="code" type="password" autocomplete="off" placeholder="처음 한 번만 입력하면 이 컴퓨터가 기억해요">
+    <label for="lesson">차시</label>
+    <select id="lesson">
+      <option value="적응">적응 차시</option>
+      <option value="2주-1">2주차 1회</option>
+      <option value="2주-2">2주차 2회</option>
+      <option value="3주-1">3주차 1회</option>
+      <option value="3주-2">3주차 2회</option>
+      <option value="시험">시험 사용</option>
+    </select>
+    <div class="row">
+      <button class="btn" id="startBtn">시작하기</button>
+    </div>
+    <div class="warn" id="setupWarn"></div>
+    <div class="row">
+      <button class="btn ghost" id="downloadBtn">이 컴퓨터의 예비 기록 내려받기</button>
+    </div>
+    <p class="small">크롬 또는 엣지 브라우저에서 열어 주세요. 처음 시작할 때 마이크 사용을 '허용'해 주세요.</p>
+  </div>
+</section>
+
+<!-- 2. 대화 화면 -->
+<section id="talk" class="screen">
+  <svg class="doran" viewBox="0 0 200 200" aria-label="도란이">
+    <ellipse cx="100" cy="112" rx="78" ry="72" fill="#FFC56B"/>
+    <ellipse cx="100" cy="128" rx="48" ry="36" fill="#FFE3AE"/>
+    <circle cx="44" cy="52" r="20" fill="#FFC56B"/><circle cx="156" cy="52" r="20" fill="#FFC56B"/>
+    <circle cx="44" cy="52" r="9" fill="#FFB0A0"/><circle cx="156" cy="52" r="9" fill="#FFB0A0"/>
+    <circle id="eyeL" cx="74" cy="100" r="9" fill="#3B2F2A"/><circle id="eyeR" cx="126" cy="100" r="9" fill="#3B2F2A"/>
+    <circle cx="77" cy="97" r="3" fill="#fff"/><circle cx="129" cy="97" r="3" fill="#fff"/>
+    <ellipse cx="100" cy="118" rx="8" ry="6" fill="#7A4A3A"/>
+    <path id="mouth" d="M86 134 Q100 146 114 134" stroke="#7A4A3A" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="58" cy="124" r="9" fill="#FF9F8E" opacity=".6"/><circle cx="142" cy="124" r="9" fill="#FF9F8E" opacity=".6"/>
+  </svg>
+  <div class="bubble" id="bubble">…</div>
+  <div class="status" id="status"></div>
+  <button class="mic" id="micBtn" aria-label="말하기">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>
+    </svg>
+  </button>
+  <div class="miclabel" id="micLabel">버튼을 누르고 말해 봐</div>
+  <div class="row"><button class="btn ghost" id="replayBtn">다시 듣기</button></div>
+  <div class="typebox" id="typebox">
+    <input id="typeInput" placeholder="(음성 인식이 안 될 때) 여기에 입력">
+    <button id="typeSend">보내기</button>
+  </div>
+  <button class="corner" id="abortBtn">선생님: 끝내기</button>
+</section>
+
+<!-- 3. 끝 화면 -->
+<section id="end" class="screen">
+  <div class="card">
+    <svg class="doran" viewBox="0 0 200 200" aria-hidden="true">
+      <ellipse cx="100" cy="112" rx="78" ry="72" fill="#FFC56B"/><ellipse cx="100" cy="128" rx="48" ry="36" fill="#FFE3AE"/>
+      <circle cx="44" cy="52" r="20" fill="#FFC56B"/><circle cx="156" cy="52" r="20" fill="#FFC56B"/>
+      <path d="M64 100 Q74 90 84 100" stroke="#3B2F2A" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M116 100 Q126 90 136 100" stroke="#3B2F2A" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="100" cy="118" rx="8" ry="6" fill="#7A4A3A"/>
+      <path d="M84 132 Q100 150 116 132" stroke="#7A4A3A" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="endtitle">이제 공책에 써 볼까?</div>
+    <p style="font-size:22px">도란이한테 말해 준 이야기를<br>공책에 써 줘!</p>
+    <button class="btn ghost" id="againBtn">선생님: 다음 학생</button>
+  </div>
+</section>
+
+<script>
+(() => {
+  const CATS = ['누가','어디서','언제','무엇을','왜','감각','감정과 이유'];
+  // 빈 범주 중 물어볼 순서
+  const PRIORITY = ['무엇을','누가','어디서','언제','감각','감정과 이유','왜'];
+  const MAX_SEC = 600, MAX_TURNS = 15, MAX_ASK_PER_CAT = 2;
+  const OPENING = '안녕! 나는 도란이야. 오늘이나 요즘 있었던 일 중에 나한테 이야기해 주고 싶은 거 있어?';
+  const CLOSING = '이야기해 줘서 고마워! 이제 나한테 말해 준 걸 공책에 써 줄래?';
+  const NOT_HEARD = '잘 못 들었어. 버튼을 누르고 한 번만 더 말해 줄래?';
+  // 서버가 안 될 때 쓰는 예비 질문
+  const FALLBACK = {
+    '무엇을':'나는 거기 없었는데, 거기서 무엇을 했어?',
+    '누가':'나는 못 봐서 궁금한데, 누구랑 같이 있었어?',
+    '어디서':'나는 거기 없었는데, 거기는 어떤 곳이었어?',
+    '언제':'나는 몰라서 궁금한데, 그건 언제 있었던 일이야?',
+    '감각':'나는 못 봐서 궁금한데, 거기서 무엇이 보이고 들렸어?',
+    '감정과 이유':'그때 기분이 어땠어? 왜 그런 기분이 들었어?',
+    '왜':'나는 몰라서 궁금한데, 왜 그렇게 하게 됐어?'
+  };
+
+  const $ = id => document.getElementById(id);
+  const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $(id).classList.add('on'); };
+
+  let S = null; // 현재 세션 상태
+  let rec = null, listening = false, finalText = '', busy = false;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  // ---------- 음성 출력 ----------
+  let koVoice = null;
+  function pickVoice(){ const v = speechSynthesis.getVoices(); koVoice = v.find(x => /ko[-_]KR/i.test(x.lang)) || null; }
+  if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  function speak(text){
+    return new Promise(res => {
+      if (!('speechSynthesis' in window)) return res();
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ko-KR'; u.rate = 0.9; if (koVoice) u.voice = koVoice;
+      let done = false; const fin = () => { if (!done){ done = true; res(); } };
+      u.onend = fin; u.onerror = fin;
+      setTimeout(fin, 4000 + text.length * 250);
+      speechSynthesis.speak(u);
+    });
+  }
+
+  function setStatus(mode){
+    const mic = $('micBtn');
+    if (mode === 'speak'){ $('status').textContent = '도란이가 말하고 있어요'; mic.disabled = true; $('micLabel').textContent = '잘 들어 봐'; }
+    else if (mode === 'think'){ $('status').textContent = '도란이가 생각하고 있어요…'; mic.disabled = true; $('micLabel').textContent = '잠깐만 기다려 줘'; }
+    else if (mode === 'listen'){ $('status').textContent = '듣고 있어요. 다 말했으면 버튼을 한 번 더 눌러 줘'; mic.disabled = false; $('micLabel').textContent = '다 말했으면 눌러 줘'; }
+    else { $('status').textContent = ''; mic.disabled = false; $('micLabel').textContent = '버튼을 누르고 말해 봐'; }
+    mic.classList.toggle('listening', mode === 'listen');
+  }
+
+  async function say(text){
+    S.lastSaid = text;
+    $('bubble').textContent = text;
+    setStatus('speak');
+    await speak(text);
+    setStatus('idle');
+  }
+
+  // ---------- 예비 기록 (이 컴퓨터) ----------
+  function backup(){
+    try {
+      const all = JSON.parse(localStorage.getItem('doran_backup') || '[]');
+      const i = all.findIndex(x => x.session_id === S.session_id);
+      const copy = JSON.parse(JSON.stringify(S));
+      if (i >= 0) all[i] = copy; else all.push(copy);
+      localStorage.setItem('doran_backup', JSON.stringify(all));
+    } catch(e) {}
+  }
+  $('downloadBtn').onclick = () => {
+    let all = [];
+    try { all = JSON.parse(localStorage.getItem('doran_backup') || '[]'); } catch(e) {}
+    if (!all.length){ $('setupWarn').textContent = '이 컴퓨터에 저장된 예비 기록이 없어요.'; return; }
+    const rows = [['세션ID','학생번호','차시','순서','경과(초)','아이가 한 말','새로 나온 정보','도란이 말']];
+    all.forEach(s => s.turns.forEach((t,k) => rows.push([s.session_id,s.student,s.lesson,k+1,t.elapsed_sec,t.child_text,
+      (t.new_items||[]).map(x=>x.category+':'+x.text).join(' / '), t.reply])));
+    const csv = '﻿' + rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g,'""') + '"').join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+    a.download = 'doran_backup_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+  };
+
+  // ---------- 서버 ----------
+  async function post(body, timeoutMs){
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), timeoutMs || 20000);
+    try {
+      const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(Object.assign({ code: CODE }, body)), headers:{'Content-Type':'text/plain;charset=utf-8'}, signal: ctl.signal });
+      return await r.json();
+    } finally { clearTimeout(t); }
+  }
+
+  function emptyCats(){ return PRIORITY.filter(c => !S.filled.includes(c) && !S.skip.includes(c)); }
+  function elapsed(){ return Math.round((Date.now() - S.t0) / 1000); }
+
+  // ---------- 비밀번호 기억 ----------
+  try { const c = localStorage.getItem('doran_code'); if (c) $('code').value = c; } catch(e) {}
+  let CODE = '';
+
+  // ---------- 시작 ----------
+  $('startBtn').onclick = async () => {
+    const student = $('student').value.trim();
+    if (student === ''){ $('setupWarn').textContent = '학생 번호를 입력해 주세요.'; return; }
+    if (API_URL.startsWith('여기에')){ $('setupWarn').textContent = '설치가 끝나지 않았어요: 코드 위쪽 API_URL에 Apps Script 주소를 넣어 주세요.'; return; }
+    CODE = $('code').value.trim();
+    if (!CODE){ $('setupWarn').textContent = '선생님 비밀번호를 입력해 주세요.'; return; }
+    $('setupWarn').textContent = '확인 중…';
+    try {
+      const r = await post({ action:'check' }, 15000);
+      if (!r.ok){ $('setupWarn').textContent = r.error === 'wrong_code' ? '비밀번호가 맞지 않아요.' : '서버 오류: ' + r.error; return; }
+    } catch(e) { $('setupWarn').textContent = '서버에 연결할 수 없어요. 인터넷 연결을 확인해 주세요.'; return; }
+    try { localStorage.setItem('doran_code', CODE); } catch(e) {}
+    $('setupWarn').textContent = '';
+    S = { session_id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), student, lesson: $('lesson').value,
+      test: student === '0' || $('lesson').value === '시험', started_at: new Date().toISOString(), t0: Date.now(),
+      filled: [], skip: [], asked: {}, history: [], turns: [], lastSaid: '' };
+    $('typebox').classList.toggle('on', !SR);
+    show('talk');
+    S.history.push({ role:'model', text: OPENING });
+    await say(OPENING);
+  };
+
+  // ---------- 듣기 ----------
+  $('micBtn').onclick = () => {
+    if (busy) return;
+    if (!SR){ $('typeInput').focus(); return; }
+    if (!listening) startListening(); else stopListening();
+  };
+  function startListening(){
+    speechSynthesis.cancel();
+    finalText = '';
+    rec = new SR(); rec.lang = 'ko-KR'; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = e => { let f = ''; for (let i = 0; i < e.results.length; i++){ if (e.results[i].isFinal) f += e.results[i][0].transcript + ' '; else f += e.results[i][0].transcript; } finalText = f; };
+    rec.onerror = e => { if (e.error === 'not-allowed'){ $('status').textContent = '마이크가 허용되지 않았어요. 선생님께 말해 줘.'; } };
+    rec.onend = () => { if (listening){ listening = false; handleChild(finalText.trim()); } };
+    try { rec.start(); listening = true; setStatus('listen'); } catch(e) { listening = false; }
+  }
+  function stopListening(){ if (rec) rec.stop(); }
+  $('typeSend').onclick = () => { const v = $('typeInput').value.trim(); $('typeInput').value = ''; if (v) handleChild(v); };
+  $('replayBtn').onclick = async () => { if (!busy && !listening && S && S.lastSaid){ await say(S.lastSaid); } };
+
+  // ---------- 한 번 주고받기 ----------
+  async function handleChild(text){
+    if (busy) return;
+    if (!text){ await say(NOT_HEARD); return; }
+    busy = true; setStatus('think');
+    const empty = emptyCats();
+    const target = empty[0] || '감정과 이유';
+    S.asked[target] = (S.asked[target] || 0) + 1;
+    let reply = '', items = [], used = target, viaServer = true;
+    try {
+      const r = await post({ action:'turn', session_id:S.session_id, student:S.student, lesson:S.lesson, test:S.test,
+        turn_index: S.turns.length + 1, elapsed_sec: elapsed(), child_text: text, history: S.history,
+        filled: S.filled, skip: S.skip, target });
+      if (!r.ok) throw new Error(r.error);
+      reply = r.reply; items = r.new_items || []; used = r.target_category || target;
+    } catch(e) {
+      viaServer = false; reply = FALLBACK[target] || FALLBACK['감정과 이유'];
+    }
+    items.forEach(it => { if (CATS.includes(it.category) && !S.filled.includes(it.category)) S.filled.push(it.category); });
+    // 같은 범주를 두 번 물어도 안 나오면 건너뛰기
+    empty.forEach(c => { if (!S.filled.includes(c) && (S.asked[c] || 0) >= MAX_ASK_PER_CAT && !S.skip.includes(c)) S.skip.push(c); });
+    S.turns.push({ child_text: text, new_items: items, reply, target: used, elapsed_sec: elapsed(), server: viaServer });
+    S.history.push({ role:'user', text }, { role:'model', text: reply });
+    backup();
+    busy = false;
+
+    const remaining = emptyCats();
+    if (!remaining.length || elapsed() >= MAX_SEC || S.turns.length >= MAX_TURNS){
+      finish(!remaining.length ? '모든 범주' : (elapsed() >= MAX_SEC ? '시간' : '대화수'));
+      return;
+    }
+    await say(reply);
+  }
+
+  // ---------- 끝내기 ----------
+  async function finish(reason){
+    S.ended_at = new Date().toISOString(); S.end_reason = reason; backup();
+    $('bubble').textContent = CLOSING; setStatus('speak');
+    post({ action:'end', session_id:S.session_id, student:S.student, lesson:S.lesson, test:S.test,
+      started_at:S.started_at, ended_at:S.ended_at, turns:S.turns.length, filled:S.filled, skip:S.skip, end_reason:reason }).catch(()=>{});
+    show('end');
+    await speak(CLOSING);
+  }
+  $('abortBtn').onclick = () => { if (S && confirm('대화를 끝낼까요?')){ if (rec) try{ rec.abort(); }catch(e){} listening = false; finish('교사 종료'); } };
+  $('againBtn').onclick = () => { speechSynthesis.cancel(); S = null; $('student').value = ''; $('setupWarn').textContent = ''; show('setup'); };
+})();
+</script>
+</body>
+</html>
