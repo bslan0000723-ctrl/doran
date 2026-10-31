@@ -8,52 +8,182 @@
   // ▼▼▼ 설치할 때 아래 따옴표 안만 바꾸세요: Apps Script 웹 앱 주소 ▼▼▼
   const API_URL = "https://script.google.com/macros/s/AKfycbyTbzZbi5BUg29Hn9StQStqx2unXtDKAyCJQ3sDop3VJlatuxj5SScEhhzPoP_E6Wjk/exec";
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FFF8EC; --card:#FFFFFF; --ink:#3B2F2A; --muted:#8A7A70;
-    --accent:#FF8A3D; --accent-ink:#FFFFFF; --listen:#E8463A; --think:#5B8DEF; --line:#EADFCF;
+    --sky1:#2B2F7A; --sky2:#151741; --sky3:#0B0C26;
+    --mint:#7FE0C4; --mint2:#3FB894;
+    --glow:#FFC94D; --glow2:#FF9F2E; --listen:#FF5D73;
+    --ink:#23255C; --soft:#C9CCF5;
+    --head:"Jua","Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic","Noto Sans CJK KR",sans-serif;
+    --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic","Noto Sans CJK KR",sans-serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
-  body{background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-    display:flex;align-items:center;justify-content:center;padding:16px}
-  .screen{display:none;width:100%;max-width:720px;text-align:center}
-  .screen.on{display:block}
-  .card{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:24px}
-  h1{font-size:28px;margin:0 0 16px}
-  label{display:block;text-align:left;font-size:16px;margin:14px 0 6px;color:var(--muted)}
-  input,select{width:100%;font-size:22px;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
-  .btn{display:inline-block;border:0;border-radius:16px;padding:16px 28px;font-size:22px;font-weight:700;cursor:pointer;
-    background:var(--accent);color:var(--accent-ink);margin-top:20px}
-  .btn.ghost{background:transparent;color:var(--muted);font-size:15px;font-weight:400;padding:8px 12px;margin-top:12px;border:1px solid var(--line)}
-  .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .warn{color:#B3261E;font-size:15px;margin-top:12px;min-height:1em}
-  .doran{width:min(42vw,220px);height:auto;display:block;margin:0 auto}
-  .bubble{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:18px 20px;font-size:clamp(22px,4.2vw,30px);
-    line-height:1.45;min-height:3.2em;margin:16px auto;max-width:640px;word-break:keep-all}
-  .status{font-size:20px;color:var(--muted);min-height:1.4em;margin:6px 0}
-  .mic{width:min(38vw,180px);height:min(38vw,180px);border-radius:50%;border:0;background:var(--accent);color:#fff;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;margin:10px auto 0;box-shadow:0 6px 0 rgba(0,0,0,.12)}
-  .mic svg{width:45%;height:45%}
-  .mic.listening{background:var(--listen);animation:pulse 1.2s infinite}
-  .mic:disabled{background:#CFC6BC;box-shadow:none;cursor:default;animation:none}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,70,58,.5)}70%{box-shadow:0 0 0 22px rgba(232,70,58,0)}100%{box-shadow:0 0 0 0 rgba(232,70,58,0)}}
-  .miclabel{font-size:20px;margin-top:10px;color:var(--muted)}
-  .corner{position:fixed;right:10px;bottom:8px;font-size:12px;color:var(--muted);background:transparent;border:0;opacity:.6}
-  .typebox{display:none;margin-top:12px}
-  .typebox.on{display:flex;gap:8px}
-  .typebox input{font-size:18px}
-  .typebox button{font-size:18px;padding:10px 16px;border-radius:12px;border:0;background:var(--think);color:#fff}
-  .endtitle{font-size:clamp(28px,5vw,40px);font-weight:800;margin:10px 0}
-  .small{font-size:14px;color:var(--muted)}
+  body{font-family:var(--body);color:var(--ink);overflow:hidden;
+    background:radial-gradient(1200px 800px at 50% 18%,var(--sky1),var(--sky2) 55%,var(--sky3));}
+
+  /* ---------- 우주 배경 ---------- */
+  .space{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite;opacity:.8}
+  @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+  .nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.45}
+  .nb1{width:520px;height:420px;left:-140px;top:-80px;background:#6B4FD8}
+  .nb2{width:560px;height:460px;right:-180px;top:30%;background:#2EA8A0;opacity:.3}
+  .planet{position:absolute;right:-90px;bottom:-110px;width:min(46vw,440px);aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%,#B9F5E1,#5FCDAA 45%,#2A8C72 80%);box-shadow:inset -30px -40px 80px rgba(0,0,0,.35),0 0 80px rgba(127,224,196,.25)}
+  .planet::before{content:"";position:absolute;left:18%;top:26%;width:22%;height:14%;border-radius:50%;background:rgba(255,255,255,.18)}
+  .planet::after{content:"";position:absolute;left:52%;top:55%;width:16%;height:10%;border-radius:50%;background:rgba(0,0,0,.12)}
+  .ringplanet{position:absolute;left:6%;top:9%;width:74px;height:74px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#FFE9A8,#FFB84D 60%,#E08A2E);box-shadow:0 0 30px rgba(255,201,77,.5)}
+  .ringplanet::after{content:"";position:absolute;left:-22px;top:28px;width:118px;height:20px;border-radius:50%;border:4px solid rgba(255,233,168,.75);transform:rotate(-18deg)}
+  .shoot{position:absolute;width:140px;height:2px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff);top:12%;left:-200px;
+    transform:rotate(18deg);animation:shoot 9s linear infinite;animation-delay:3s;opacity:0}
+  @keyframes shoot{0%{left:-200px;top:8%;opacity:0}3%{opacity:1}12%{left:110%;top:38%;opacity:0}100%{left:110%;opacity:0}}
+
+  /* ---------- 공통 ---------- */
+  .screen{position:relative;z-index:1;display:none;min-height:100%;padding:24px 20px;align-items:center;justify-content:center}
+  .screen.on{display:flex}
+  .btn{font-family:var(--head);border:0;border-radius:18px;padding:16px 34px;font-size:24px;cursor:pointer;color:#3A2300;
+    background:linear-gradient(#FFD875,var(--glow2));box-shadow:0 6px 0 #C46F12,0 0 24px rgba(255,201,77,.35);transition:transform .1s}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #C46F12}
+  .ghost{font-family:var(--body);background:transparent;border:1px solid rgba(201,204,245,.35);color:var(--soft);border-radius:12px;padding:8px 14px;font-size:15px;cursor:pointer}
+
+  /* ---------- 준비 화면 ---------- */
+  .panel{width:min(520px,100%);background:rgba(255,255,255,.08);border:1px solid rgba(201,204,245,.25);border-radius:28px;padding:28px 26px;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .panel h1{font-family:var(--head);font-weight:400;font-size:32px;margin:0 0 4px;text-align:center}
+  .panel .sub{text-align:center;color:var(--soft);margin:0 0 18px;font-size:16px}
+  .panel label{display:block;margin:14px 0 6px;color:var(--soft);font-size:15px}
+  .panel input,.panel select{width:100%;font-size:20px;padding:12px 14px;border-radius:14px;border:1px solid rgba(201,204,245,.35);
+    background:rgba(11,12,38,.55);color:#fff;font-family:var(--body)}
+  .panel select option{color:#000}
+  .panel .row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:22px}
+  .warn{min-height:1.3em;text-align:center;color:#FFB3BF;margin-top:12px;font-size:15px}
+  .tiny{color:var(--soft);font-size:13px;text-align:center;margin-top:14px;line-height:1.5;opacity:.85}
+
+  /* ---------- 대화 화면 ---------- */
+  .stage{width:min(1100px,100%);display:grid;grid-template-columns:minmax(220px,360px) 1fr;gap:28px;align-items:center}
+  .doranWrap{position:relative;display:flex;flex-direction:column;align-items:center}
+  .tag{font-family:var(--head);color:var(--mint);font-size:18px;letter-spacing:.5px;margin-bottom:6px;opacity:.9}
+  .doran{width:min(34vw,320px);height:auto;overflow:visible;animation:float 4s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .shadow{width:52%;height:16px;border-radius:50%;background:rgba(0,0,0,.35);filter:blur(4px);margin-top:4px;animation:shadow 4s ease-in-out infinite}
+  @keyframes shadow{0%,100%{transform:scaleX(1);opacity:.55}50%{transform:scaleX(.82);opacity:.35}}
+  .lid{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
+  @keyframes blink{0%,92%,100%{transform:scaleY(0)}95%{transform:scaleY(1)}}
+  .pupil{transition:transform .4s}
+  .ant{transform-box:fill-box;transform-origin:bottom center;animation:wiggle 3s ease-in-out infinite}
+  .ant.r{animation-delay:.4s}
+  @keyframes wiggle{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+  .tip{transition:filter .3s}
+  .mouthOpen{opacity:0;transform-box:fill-box;transform-origin:center}
+  .speaking .mouthOpen{opacity:1;animation:talk .22s ease-in-out infinite alternate}
+  .speaking .mouthSmile{opacity:0}
+  @keyframes talk{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+  .listening .tip{filter:drop-shadow(0 0 10px #FFE58A) drop-shadow(0 0 18px #FFC94D)}
+  .listening .ant{animation-duration:1s}
+  .wave{fill:none;stroke:var(--mint);stroke-width:3;opacity:0;transform-box:fill-box;transform-origin:center}
+  .listening .wave{animation:wave 1.6s ease-out infinite}
+  .listening .wave.w2{animation-delay:.5s}
+  @keyframes wave{0%{opacity:.8;transform:scale(.85)}100%{opacity:0;transform:scale(1.25)}}
+  .thinking .pupil{transform:translate(6px,-7px)}
+  .dots{opacity:0}
+  .thinking .dots{opacity:1}
+  .dots circle{animation:dot 1.2s infinite}
+  .dots circle:nth-child(2){animation-delay:.2s}.dots circle:nth-child(3){animation-delay:.4s}
+  @keyframes dot{0%,100%{opacity:.25}50%{opacity:1}}
+  .end .doran{width:min(40vw,240px)}
+
+  .talkSide{display:flex;flex-direction:column;align-items:center}
+  .bubble{position:relative;width:100%;min-height:8.5em;display:flex;align-items:center;justify-content:center;text-align:center;
+    background:linear-gradient(180deg,#FFFFFF,#F1F2FF);border-radius:32px;padding:26px 30px;font-family:var(--head);
+    font-size:clamp(24px,3.1vw,36px);line-height:1.45;color:var(--ink);word-break:keep-all;
+    box-shadow:0 0 0 6px rgba(127,224,196,.35),0 18px 40px rgba(0,0,0,.35)}
+  .bubble::before{content:"";position:absolute;left:-22px;top:50%;margin-top:-16px;border:16px solid transparent;border-right:22px solid #FAFAFF}
+  .bubble.pop{animation:pop .35s ease-out}
+  @keyframes pop{0%{transform:scale(.96);opacity:.6}100%{transform:scale(1);opacity:1}}
+  .status{min-height:1.6em;margin:18px 0 6px;font-size:19px;color:var(--soft);text-align:center}
+  .micWrap{position:relative;width:min(36vw,170px);aspect-ratio:1;margin-top:6px}
+  .mic{position:absolute;inset:0;border-radius:50%;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 30%,#FFE7A3,var(--glow) 45%,var(--glow2));
+    box-shadow:0 10px 0 #C46F12,0 0 0 10px rgba(255,201,77,.18),0 0 50px rgba(255,201,77,.45);transition:transform .1s,filter .2s}
+  .mic:active{transform:translateY(5px);box-shadow:0 5px 0 #C46F12,0 0 0 10px rgba(255,201,77,.18)}
+  .mic svg{width:42%;height:42%}
+  .mic.listening{background:radial-gradient(circle at 35% 30%,#FFB4C0,var(--listen) 55%,#D63A55);box-shadow:0 10px 0 #9E2238,0 0 0 10px rgba(255,93,115,.2),0 0 60px rgba(255,93,115,.55)}
+  .ripple{position:absolute;inset:0;border-radius:50%;border:4px solid var(--listen);opacity:0;pointer-events:none}
+  .mic.listening ~ .ripple{animation:ripple 1.4s ease-out infinite}
+  .mic.listening ~ .ripple.r2{animation-delay:.7s}
+  @keyframes ripple{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.55);opacity:0}}
+  .mic:disabled{filter:grayscale(.85) brightness(.75);cursor:default;box-shadow:0 6px 0 #555}
+  .miclabel{font-family:var(--head);font-size:22px;color:#fff;margin-top:22px;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+  .tools{display:flex;gap:10px;margin-top:14px}
+  .typebox{display:none;gap:8px;margin-top:12px;width:100%;max-width:520px}
+  .typebox.on{display:flex}
+  .typebox input{flex:1;font-size:18px;padding:10px 12px;border-radius:12px;border:0}
+  .typebox button{font-size:17px;border:0;border-radius:12px;padding:10px 16px;background:var(--mint2);color:#fff;cursor:pointer}
+  .corner{position:fixed;right:12px;bottom:10px;z-index:2;font-size:12px;opacity:.55}
+
+  /* ---------- 끝 화면 ---------- */
+  .endBox{text-align:center;color:#fff}
+  .endTitle{font-family:var(--head);font-size:clamp(32px,5vw,52px);margin:8px 0 6px;text-shadow:0 4px 18px rgba(0,0,0,.4)}
+  .endSub{font-size:clamp(20px,2.6vw,26px);color:var(--soft);margin:0 0 20px;line-height:1.5}
+  .notebook{display:inline-block;width:86px;height:70px;border-radius:10px;background:#FFF6DC;position:relative;margin:4px 0 10px;
+    box-shadow:0 8px 20px rgba(0,0,0,.35);transform:rotate(-6deg)}
+  .notebook::before{content:"";position:absolute;left:10px;right:10px;top:18px;height:34px;background:repeating-linear-gradient(#FFF6DC 0 8px,#B9C3F0 8px 10px)}
+  .notebook::after{content:"";position:absolute;left:-6px;top:6px;bottom:6px;width:10px;border-radius:4px;background:var(--glow2)}
+
+  @media (max-width:760px){
+    .stage{grid-template-columns:1fr;gap:10px}
+    .doran{width:min(46vw,200px)}
+    .tag{font-size:15px}
+    .bubble{min-height:6em;font-size:clamp(21px,5.6vw,28px)}
+    .bubble::before{left:50%;top:-24px;margin:0 0 0 -16px;border:16px solid transparent;border-bottom:22px solid #fff}
+    .micWrap{width:min(40vw,150px)}
+    .ringplanet{display:none}
+  }
 </style>
 </head>
 <body>
 
+<div class="space" id="space">
+  <div class="nebula nb1"></div><div class="nebula nb2"></div>
+  <div class="ringplanet"></div><div class="planet"></div><div class="shoot"></div>
+</div>
+
+<!-- 도란이 그림 -->
+<template id="doranTpl">
+  <svg class="doran" viewBox="-20 -20 240 250" aria-label="도란이">
+    <defs>
+      <radialGradient id="gBody" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#C8F7E8"/><stop offset=".55" stop-color="#7FE0C4"/><stop offset="1" stop-color="#3FB894"/></radialGradient>
+      <radialGradient id="gBelly" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D6FFF1"/></radialGradient>
+      <radialGradient id="gTip" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#FFF6C8"/><stop offset="1" stop-color="#FFC94D"/></radialGradient>
+    </defs>
+    <circle class="wave" cx="100" cy="112" r="96"/><circle class="wave w2" cx="100" cy="112" r="96"/>
+    <g class="ant l"><path d="M74 46 Q60 22 56 4" stroke="#3FB894" stroke-width="6" fill="none" stroke-linecap="round"/><circle class="tip" cx="56" cy="2" r="10" fill="url(#gTip)"/></g>
+    <g class="ant r"><path d="M126 46 Q140 22 144 4" stroke="#3FB894" stroke-width="6" fill="none" stroke-linecap="round"/><circle class="tip" cx="144" cy="2" r="10" fill="url(#gTip)"/></g>
+    <ellipse cx="22" cy="134" rx="16" ry="24" fill="#5FCDAA" transform="rotate(20 22 134)"/>
+    <ellipse cx="178" cy="134" rx="16" ry="24" fill="#5FCDAA" transform="rotate(-20 178 134)"/>
+    <ellipse cx="100" cy="114" rx="82" ry="78" fill="url(#gBody)"/>
+    <ellipse cx="70" cy="62" rx="22" ry="12" fill="#fff" opacity=".35" transform="rotate(-25 70 62)"/>
+    <ellipse cx="100" cy="140" rx="50" ry="38" fill="url(#gBelly)"/>
+    <ellipse cx="100" cy="92" rx="30" ry="32" fill="#fff"/>
+    <g class="pupil"><circle cx="100" cy="94" r="17" fill="#23255C"/><circle cx="107" cy="86" r="6" fill="#fff"/><circle cx="94" cy="101" r="2.5" fill="#fff" opacity=".8"/></g>
+    <ellipse class="lid" cx="100" cy="92" rx="31" ry="33" fill="#7FE0C4"/>
+    <path class="mouthSmile" d="M84 140 Q100 154 116 140" stroke="#23255C" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse class="mouthOpen" cx="100" cy="144" rx="12" ry="9" fill="#23255C"/>
+    <circle cx="54" cy="128" r="11" fill="#FF9FB8" opacity=".65"/><circle cx="146" cy="128" r="11" fill="#FF9FB8" opacity=".65"/>
+    <g class="dots" fill="#fff"><circle cx="160" cy="34" r="6"/><circle cx="178" cy="22" r="7"/><circle cx="198" cy="8" r="8"/></g>
+  </svg>
+</template>
+
 <!-- 1. 교사 준비 화면 -->
 <section id="setup" class="screen on">
-  <div class="card">
-    <h1>도란이 준비 (선생님)</h1>
+  <div class="panel">
+    <h1>도란이 우주정거장</h1>
+    <p class="sub">선생님 준비 화면</p>
     <label for="student">학생 번호</label>
     <input id="student" type="number" min="0" inputmode="numeric" placeholder="예: 7  (0번 = 시험용)">
     <label for="code">선생님 비밀번호</label>
@@ -67,77 +197,66 @@
       <option value="3주-2">3주차 2회</option>
       <option value="시험">시험 사용</option>
     </select>
-    <div class="row">
-      <button class="btn" id="startBtn">시작하기</button>
-    </div>
+    <div class="row"><button class="btn" id="startBtn">출발!</button></div>
     <div class="warn" id="setupWarn"></div>
-    <div class="row">
-      <button class="btn ghost" id="downloadBtn">이 컴퓨터의 예비 기록 내려받기</button>
-    </div>
-    <p class="small">크롬 또는 엣지 브라우저에서 열어 주세요. 처음 시작할 때 마이크 사용을 '허용'해 주세요.</p>
+    <div class="row"><button class="ghost" id="downloadBtn">이 컴퓨터의 예비 기록 내려받기</button></div>
+    <p class="tiny">크롬 또는 엣지에서 열어 주세요. 처음 시작할 때 마이크 사용을 '허용'해 주세요.</p>
   </div>
 </section>
 
 <!-- 2. 대화 화면 -->
 <section id="talk" class="screen">
-  <svg class="doran" viewBox="0 0 200 200" aria-label="도란이">
-    <ellipse cx="100" cy="112" rx="78" ry="72" fill="#FFC56B"/>
-    <ellipse cx="100" cy="128" rx="48" ry="36" fill="#FFE3AE"/>
-    <circle cx="44" cy="52" r="20" fill="#FFC56B"/><circle cx="156" cy="52" r="20" fill="#FFC56B"/>
-    <circle cx="44" cy="52" r="9" fill="#FFB0A0"/><circle cx="156" cy="52" r="9" fill="#FFB0A0"/>
-    <circle id="eyeL" cx="74" cy="100" r="9" fill="#3B2F2A"/><circle id="eyeR" cx="126" cy="100" r="9" fill="#3B2F2A"/>
-    <circle cx="77" cy="97" r="3" fill="#fff"/><circle cx="129" cy="97" r="3" fill="#fff"/>
-    <ellipse cx="100" cy="118" rx="8" ry="6" fill="#7A4A3A"/>
-    <path id="mouth" d="M86 134 Q100 146 114 134" stroke="#7A4A3A" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <circle cx="58" cy="124" r="9" fill="#FF9F8E" opacity=".6"/><circle cx="142" cy="124" r="9" fill="#FF9F8E" opacity=".6"/>
-  </svg>
-  <div class="bubble" id="bubble">…</div>
-  <div class="status" id="status"></div>
-  <button class="mic" id="micBtn" aria-label="말하기">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>
-    </svg>
-  </button>
-  <div class="miclabel" id="micLabel">버튼을 누르고 말해 봐</div>
-  <div class="row"><button class="btn ghost" id="replayBtn">다시 듣기</button></div>
-  <div class="typebox" id="typebox">
-    <input id="typeInput" placeholder="(음성 인식이 안 될 때) 여기에 입력">
-    <button id="typeSend">보내기</button>
+  <div class="stage">
+    <div class="doranWrap">
+      <div class="tag">지구에 처음 온 도란이</div>
+      <div id="doranSlot"></div>
+      <div class="shadow"></div>
+    </div>
+    <div class="talkSide">
+      <div class="bubble" id="bubble">…</div>
+      <div class="status" id="status"></div>
+      <div class="micWrap">
+        <button class="mic" id="micBtn" aria-label="말하기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#23255C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>
+          </svg>
+        </button>
+        <div class="ripple"></div><div class="ripple r2"></div>
+      </div>
+      <div class="miclabel" id="micLabel">버튼을 누르고 말해 줘</div>
+      <div class="tools"><button class="ghost" id="replayBtn">다시 듣기</button></div>
+      <div class="typebox" id="typebox">
+        <input id="typeInput" placeholder="(음성 인식이 안 될 때) 여기에 입력">
+        <button id="typeSend">보내기</button>
+      </div>
+    </div>
   </div>
-  <button class="corner" id="abortBtn">선생님: 끝내기</button>
+  <button class="ghost corner" id="abortBtn">선생님: 끝내기</button>
 </section>
 
 <!-- 3. 끝 화면 -->
 <section id="end" class="screen">
-  <div class="card">
-    <svg class="doran" viewBox="0 0 200 200" aria-hidden="true">
-      <ellipse cx="100" cy="112" rx="78" ry="72" fill="#FFC56B"/><ellipse cx="100" cy="128" rx="48" ry="36" fill="#FFE3AE"/>
-      <circle cx="44" cy="52" r="20" fill="#FFC56B"/><circle cx="156" cy="52" r="20" fill="#FFC56B"/>
-      <path d="M64 100 Q74 90 84 100" stroke="#3B2F2A" stroke-width="5" fill="none" stroke-linecap="round"/>
-      <path d="M116 100 Q126 90 136 100" stroke="#3B2F2A" stroke-width="5" fill="none" stroke-linecap="round"/>
-      <ellipse cx="100" cy="118" rx="8" ry="6" fill="#7A4A3A"/>
-      <path d="M84 132 Q100 150 116 132" stroke="#7A4A3A" stroke-width="5" fill="none" stroke-linecap="round"/>
-    </svg>
-    <div class="endtitle">이제 공책에 써 볼까?</div>
-    <p style="font-size:22px">도란이한테 말해 준 이야기를<br>공책에 써 줘!</p>
-    <button class="btn ghost" id="againBtn">선생님: 다음 학생</button>
+  <div class="endBox end">
+    <div id="doranSlotEnd"></div>
+    <div><span class="notebook"></span></div>
+    <div class="endTitle">이제 공책에 써 볼까?</div>
+    <p class="endSub">도란이한테 들려준 이야기를<br>공책에 써 줘!</p>
+    <button class="ghost" id="againBtn">선생님: 다음 학생</button>
   </div>
 </section>
 
 <script>
 (() => {
   const CATS = ['누가','어디서','언제','무엇을','왜','감각','감정과 이유'];
-  // 빈 범주 중 물어볼 순서
   const PRIORITY = ['무엇을','누가','어디서','언제','감각','감정과 이유','왜'];
   const MAX_SEC = 600, MAX_TURNS = 15, MAX_ASK_PER_CAT = 2;
-  const OPENING = '안녕! 나는 도란이야. 오늘이나 요즘 있었던 일 중에 나한테 이야기해 주고 싶은 거 있어?';
-  const CLOSING = '이야기해 줘서 고마워! 이제 나한테 말해 준 걸 공책에 써 줄래?';
+  const OPENING = '안녕! 나는 우주에서 온 도란이야. 지구는 처음이라 다 궁금해. 오늘이나 요즘 있었던 일 하나만 이야기해 줄래?';
+  const CLOSING = '이야기해 줘서 정말 고마워! 이제 나한테 들려준 이야기를 공책에 써 줄래?';
   const NOT_HEARD = '잘 못 들었어. 버튼을 누르고 한 번만 더 말해 줄래?';
-  // 서버가 안 될 때 쓰는 예비 질문
   const FALLBACK = {
     '무엇을':'나는 거기 없었는데, 거기서 무엇을 했어?',
     '누가':'나는 못 봐서 궁금한데, 누구랑 같이 있었어?',
-    '어디서':'나는 거기 없었는데, 거기는 어떤 곳이었어?',
+    '어디서':'나는 지구를 잘 몰라서 궁금한데, 거기는 어떤 곳이었어?',
     '언제':'나는 몰라서 궁금한데, 그건 언제 있었던 일이야?',
     '감각':'나는 못 봐서 궁금한데, 거기서 무엇이 보이고 들렸어?',
     '감정과 이유':'그때 기분이 어땠어? 왜 그런 기분이 들었어?',
@@ -147,89 +266,127 @@
   const $ = id => document.getElementById(id);
   const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $(id).classList.add('on'); };
 
-  let S = null; // 현재 세션 상태
+  // 별 뿌리기
+  (function stars(){
+    const sp = $('space'), n = Math.round(Math.min(160, innerWidth * innerHeight / 9000));
+    for (let i = 0; i < n; i++){
+      const s = document.createElement('div'); s.className = 'star';
+      const z = Math.random() < .12 ? 3 : (Math.random() < .5 ? 2 : 1.3);
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${z}px;height:${z}px;--d:${2+Math.random()*4}s;animation-delay:${-Math.random()*5}s`;
+      sp.appendChild(s);
+    }
+  })();
+
+  // 도란이 넣기
+  const tpl = $('doranTpl');
+  function placeDoran(slot, suffix){
+    const html = tpl.innerHTML.replace(/id="(g\w+)"/g, `id="$1${suffix}"`).replace(/url\(#(g\w+)\)/g, `url(#$1${suffix})`);
+    $(slot).innerHTML = html;
+  }
+  placeDoran('doranSlot', 'T'); placeDoran('doranSlotEnd', 'E');
+  const doranEl = $('doranSlot').querySelector('svg');
+  function pose(p){ doranEl.classList.remove('speaking','listening','thinking'); if (p) doranEl.classList.add(p); }
+
+  let S = null, CODE = '';
   let rec = null, listening = false, finalText = '', busy = false;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  // ---------- 음성 출력 ----------
+  // ---------- 소리 (Gemini 음성 → 안 되면 브라우저 음성) ----------
+  let actx = null, curSrc = null;
+  function audioCtx(){ if (!actx){ const C = window.AudioContext || window.webkitAudioContext; if (C) actx = new C(); } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
+  function stopAudio(){ try { if (curSrc) curSrc.stop(); } catch(e) {} curSrc = null; if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+  function playPcm(audio){
+    return new Promise(res => {
+      const ctx = audioCtx(); if (!ctx || !audio || !audio.data) return res(false);
+      try {
+        const rate = Number((/rate=(\d+)/.exec(audio.mime || '') || [])[1] || 24000);
+        const bin = atob(audio.data), n = bin.length >> 1, buf = ctx.createBuffer(1, n, rate), ch = buf.getChannelData(0);
+        for (let i = 0; i < n; i++){ let v = bin.charCodeAt(2*i) | (bin.charCodeAt(2*i+1) << 8); if (v >= 32768) v -= 65536; ch[i] = v / 32768; }
+        const src = ctx.createBufferSource(); src.buffer = buf; src.connect(ctx.destination);
+        curSrc = src; src.onended = () => { if (curSrc === src) curSrc = null; res(true); };
+        src.start();
+      } catch(e) { res(false); }
+    });
+  }
   let koVoice = null;
-  function pickVoice(){ const v = speechSynthesis.getVoices(); koVoice = v.find(x => /ko[-_]KR/i.test(x.lang)) || null; }
+  function pickVoice(){ const v = speechSynthesis.getVoices().filter(x => /ko[-_]KR/i.test(x.lang)); koVoice = v.find(x => /Natural|Online|SunHi|Google/i.test(x.name)) || v[0] || null; }
   if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-  function speak(text){
+  function speakBrowser(text){
     return new Promise(res => {
       if (!('speechSynthesis' in window)) return res();
       speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ko-KR'; u.rate = 0.9; if (koVoice) u.voice = koVoice;
+      const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; u.rate = 0.92; u.pitch = 1.15; if (koVoice) u.voice = koVoice;
       let done = false; const fin = () => { if (!done){ done = true; res(); } };
-      u.onend = fin; u.onerror = fin;
-      setTimeout(fin, 4000 + text.length * 250);
+      u.onend = fin; u.onerror = fin; setTimeout(fin, 4000 + text.length * 250);
       speechSynthesis.speak(u);
     });
+  }
+  async function speak(text, audio){ stopAudio(); const ok = await playPcm(audio); if (!ok) await speakBrowser(text); }
+
+  // 늘 같은 문장은 한 번만 만들어 이 컴퓨터에 저장
+  const fixedAudio = {};
+  async function getFixed(key, text){
+    if (fixedAudio[key]) return fixedAudio[key];
+    try { const c = localStorage.getItem('doran_tts_v2_' + key); if (c){ fixedAudio[key] = JSON.parse(c); return fixedAudio[key]; } } catch(e) {}
+    try {
+      const r = await post({ action:'tts', text }, 25000);
+      if (r.ok && r.audio){ fixedAudio[key] = r.audio; try { localStorage.setItem('doran_tts_v2_' + key, JSON.stringify(r.audio)); } catch(e) {} return r.audio; }
+    } catch(e) {}
+    return null;
   }
 
   function setStatus(mode){
     const mic = $('micBtn');
-    if (mode === 'speak'){ $('status').textContent = '도란이가 말하고 있어요'; mic.disabled = true; $('micLabel').textContent = '잘 들어 봐'; }
-    else if (mode === 'think'){ $('status').textContent = '도란이가 생각하고 있어요…'; mic.disabled = true; $('micLabel').textContent = '잠깐만 기다려 줘'; }
-    else if (mode === 'listen'){ $('status').textContent = '듣고 있어요. 다 말했으면 버튼을 한 번 더 눌러 줘'; mic.disabled = false; $('micLabel').textContent = '다 말했으면 눌러 줘'; }
-    else { $('status').textContent = ''; mic.disabled = false; $('micLabel').textContent = '버튼을 누르고 말해 봐'; }
+    const t = { speak:['도란이가 말하고 있어요','잘 들어 봐'], think:['도란이가 생각하고 있어요…','잠깐만 기다려 줘'],
+      listen:['듣고 있어요! 다 말했으면 버튼을 한 번 더 눌러 줘','다 말했으면 눌러 줘'], idle:['','버튼을 누르고 말해 줘'] }[mode];
+    $('status').textContent = t[0]; $('micLabel').textContent = t[1];
+    mic.disabled = (mode === 'speak' || mode === 'think');
     mic.classList.toggle('listening', mode === 'listen');
+    pose(mode === 'speak' ? 'speaking' : mode === 'listen' ? 'listening' : mode === 'think' ? 'thinking' : '');
+  }
+  async function say(text, audio){
+    S.lastSaid = text; S.lastAudio = audio || null;
+    const b = $('bubble'); b.textContent = text; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+    setStatus('speak'); await speak(text, audio); setStatus('idle');
   }
 
-  async function say(text){
-    S.lastSaid = text;
-    $('bubble').textContent = text;
-    setStatus('speak');
-    await speak(text);
-    setStatus('idle');
-  }
-
-  // ---------- 예비 기록 (이 컴퓨터) ----------
+  // ---------- 예비 기록 ----------
   function backup(){
     try {
       const all = JSON.parse(localStorage.getItem('doran_backup') || '[]');
+      const copy = JSON.parse(JSON.stringify(Object.assign({}, S, { lastAudio:null })));
       const i = all.findIndex(x => x.session_id === S.session_id);
-      const copy = JSON.parse(JSON.stringify(S));
       if (i >= 0) all[i] = copy; else all.push(copy);
       localStorage.setItem('doran_backup', JSON.stringify(all));
     } catch(e) {}
   }
   $('downloadBtn').onclick = () => {
-    let all = [];
-    try { all = JSON.parse(localStorage.getItem('doran_backup') || '[]'); } catch(e) {}
+    let all = []; try { all = JSON.parse(localStorage.getItem('doran_backup') || '[]'); } catch(e) {}
     if (!all.length){ $('setupWarn').textContent = '이 컴퓨터에 저장된 예비 기록이 없어요.'; return; }
     const rows = [['세션ID','학생번호','차시','순서','경과(초)','아이가 한 말','새로 나온 정보','도란이 말']];
-    all.forEach(s => s.turns.forEach((t,k) => rows.push([s.session_id,s.student,s.lesson,k+1,t.elapsed_sec,t.child_text,
-      (t.new_items||[]).map(x=>x.category+':'+x.text).join(' / '), t.reply])));
+    all.forEach(s => (s.turns||[]).forEach((t,k) => rows.push([s.session_id,s.student,s.lesson,k+1,t.elapsed_sec,t.child_text,(t.new_items||[]).map(x=>x.category+':'+x.text).join(' / '),t.reply])));
     const csv = '﻿' + rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g,'""') + '"').join(',')).join('\n');
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-    a.download = 'doran_backup_' + new Date().toISOString().slice(0,10) + '.csv';
-    a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+    a.download = 'doran_backup_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
   };
 
   // ---------- 서버 ----------
   async function post(body, timeoutMs){
-    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), timeoutMs || 20000);
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), timeoutMs || 30000);
     try {
       const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(Object.assign({ code: CODE }, body)), headers:{'Content-Type':'text/plain;charset=utf-8'}, signal: ctl.signal });
       return await r.json();
     } finally { clearTimeout(t); }
   }
-
   function emptyCats(){ return PRIORITY.filter(c => !S.filled.includes(c) && !S.skip.includes(c)); }
   function elapsed(){ return Math.round((Date.now() - S.t0) / 1000); }
 
-  // ---------- 비밀번호 기억 ----------
-  try { const c = localStorage.getItem('doran_code'); if (c) $('code').value = c; } catch(e) {}
-  let CODE = '';
-
   // ---------- 시작 ----------
+  try { const c = localStorage.getItem('doran_code'); if (c) $('code').value = c; } catch(e) {}
   $('startBtn').onclick = async () => {
+    audioCtx();
     const student = $('student').value.trim();
     if (student === ''){ $('setupWarn').textContent = '학생 번호를 입력해 주세요.'; return; }
-    if (API_URL.startsWith('여기에')){ $('setupWarn').textContent = '설치가 끝나지 않았어요: 코드 위쪽 API_URL에 Apps Script 주소를 넣어 주세요.'; return; }
     CODE = $('code').value.trim();
     if (!CODE){ $('setupWarn').textContent = '선생님 비밀번호를 입력해 주세요.'; return; }
     $('setupWarn').textContent = '확인 중…';
@@ -238,14 +395,17 @@
       if (!r.ok){ $('setupWarn').textContent = r.error === 'wrong_code' ? '비밀번호가 맞지 않아요.' : '서버 오류: ' + r.error; return; }
     } catch(e) { $('setupWarn').textContent = '서버에 연결할 수 없어요. 인터넷 연결을 확인해 주세요.'; return; }
     try { localStorage.setItem('doran_code', CODE); } catch(e) {}
+    $('setupWarn').textContent = '도란이를 깨우는 중…';
+    const opening = await getFixed('opening', OPENING);
+    getFixed('closing', CLOSING); getFixed('notheard', NOT_HEARD);
     $('setupWarn').textContent = '';
     S = { session_id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), student, lesson: $('lesson').value,
       test: student === '0' || $('lesson').value === '시험', started_at: new Date().toISOString(), t0: Date.now(),
-      filled: [], skip: [], asked: {}, history: [], turns: [], lastSaid: '' };
+      filled: [], skip: [], asked: {}, history: [], turns: [], lastSaid: '', lastAudio: null };
     $('typebox').classList.toggle('on', !SR);
     show('talk');
     S.history.push({ role:'model', text: OPENING });
-    await say(OPENING);
+    await say(OPENING, opening);
   };
 
   // ---------- 듣기 ----------
@@ -255,63 +415,54 @@
     if (!listening) startListening(); else stopListening();
   };
   function startListening(){
-    speechSynthesis.cancel();
-    finalText = '';
+    stopAudio(); finalText = '';
     rec = new SR(); rec.lang = 'ko-KR'; rec.continuous = true; rec.interimResults = true;
-    rec.onresult = e => { let f = ''; for (let i = 0; i < e.results.length; i++){ if (e.results[i].isFinal) f += e.results[i][0].transcript + ' '; else f += e.results[i][0].transcript; } finalText = f; };
-    rec.onerror = e => { if (e.error === 'not-allowed'){ $('status').textContent = '마이크가 허용되지 않았어요. 선생님께 말해 줘.'; } };
+    rec.onresult = e => { let f = ''; for (let i = 0; i < e.results.length; i++) f += e.results[i][0].transcript + (e.results[i].isFinal ? ' ' : ''); finalText = f; };
+    rec.onerror = e => { if (e.error === 'not-allowed') $('status').textContent = '마이크가 허용되지 않았어요. 선생님께 말해 줘.'; };
     rec.onend = () => { if (listening){ listening = false; handleChild(finalText.trim()); } };
     try { rec.start(); listening = true; setStatus('listen'); } catch(e) { listening = false; }
   }
   function stopListening(){ if (rec) rec.stop(); }
   $('typeSend').onclick = () => { const v = $('typeInput').value.trim(); $('typeInput').value = ''; if (v) handleChild(v); };
-  $('replayBtn').onclick = async () => { if (!busy && !listening && S && S.lastSaid){ await say(S.lastSaid); } };
+  $('replayBtn').onclick = async () => { if (!busy && !listening && S && S.lastSaid) await say(S.lastSaid, S.lastAudio); };
 
   // ---------- 한 번 주고받기 ----------
   async function handleChild(text){
     if (busy) return;
-    if (!text){ await say(NOT_HEARD); return; }
+    if (!text){ await say(NOT_HEARD, await getFixed('notheard', NOT_HEARD)); return; }
     busy = true; setStatus('think');
     const empty = emptyCats();
     const target = empty[0] || '감정과 이유';
     S.asked[target] = (S.asked[target] || 0) + 1;
-    let reply = '', items = [], used = target, viaServer = true;
+    let reply = '', items = [], used = target, audio = null, viaServer = true;
     try {
       const r = await post({ action:'turn', session_id:S.session_id, student:S.student, lesson:S.lesson, test:S.test,
-        turn_index: S.turns.length + 1, elapsed_sec: elapsed(), child_text: text, history: S.history,
-        filled: S.filled, skip: S.skip, target });
+        turn_index: S.turns.length + 1, elapsed_sec: elapsed(), child_text: text, history: S.history, filled: S.filled, skip: S.skip, target });
       if (!r.ok) throw new Error(r.error);
-      reply = r.reply; items = r.new_items || []; used = r.target_category || target;
-    } catch(e) {
-      viaServer = false; reply = FALLBACK[target] || FALLBACK['감정과 이유'];
-    }
+      reply = r.reply; items = r.new_items || []; used = r.target_category || target; audio = r.audio || null;
+    } catch(e) { viaServer = false; reply = FALLBACK[target] || FALLBACK['감정과 이유']; }
     items.forEach(it => { if (CATS.includes(it.category) && !S.filled.includes(it.category)) S.filled.push(it.category); });
-    // 같은 범주를 두 번 물어도 안 나오면 건너뛰기
     empty.forEach(c => { if (!S.filled.includes(c) && (S.asked[c] || 0) >= MAX_ASK_PER_CAT && !S.skip.includes(c)) S.skip.push(c); });
     S.turns.push({ child_text: text, new_items: items, reply, target: used, elapsed_sec: elapsed(), server: viaServer });
     S.history.push({ role:'user', text }, { role:'model', text: reply });
-    backup();
-    busy = false;
-
+    backup(); busy = false;
     const remaining = emptyCats();
     if (!remaining.length || elapsed() >= MAX_SEC || S.turns.length >= MAX_TURNS){
-      finish(!remaining.length ? '모든 범주' : (elapsed() >= MAX_SEC ? '시간' : '대화수'));
-      return;
+      finish(!remaining.length ? '모든 범주' : (elapsed() >= MAX_SEC ? '시간' : '대화수')); return;
     }
-    await say(reply);
+    await say(reply, audio);
   }
 
   // ---------- 끝내기 ----------
   async function finish(reason){
     S.ended_at = new Date().toISOString(); S.end_reason = reason; backup();
-    $('bubble').textContent = CLOSING; setStatus('speak');
-    post({ action:'end', session_id:S.session_id, student:S.student, lesson:S.lesson, test:S.test,
-      started_at:S.started_at, ended_at:S.ended_at, turns:S.turns.length, filled:S.filled, skip:S.skip, end_reason:reason }).catch(()=>{});
+    post({ action:'end', session_id:S.session_id, student:S.student, lesson:S.lesson, test:S.test, started_at:S.started_at,
+      ended_at:S.ended_at, turns:S.turns.length, filled:S.filled, skip:S.skip, end_reason:reason }).catch(()=>{});
     show('end');
-    await speak(CLOSING);
+    await speak(CLOSING, await getFixed('closing', CLOSING));
   }
-  $('abortBtn').onclick = () => { if (S && confirm('대화를 끝낼까요?')){ if (rec) try{ rec.abort(); }catch(e){} listening = false; finish('교사 종료'); } };
-  $('againBtn').onclick = () => { speechSynthesis.cancel(); S = null; $('student').value = ''; $('setupWarn').textContent = ''; show('setup'); };
+  $('abortBtn').onclick = () => { if (S && confirm('대화를 끝낼까요?')){ if (rec) try { rec.abort(); } catch(e) {} listening = false; stopAudio(); finish('교사 종료'); } };
+  $('againBtn').onclick = () => { stopAudio(); S = null; $('student').value = ''; $('setupWarn').textContent = ''; show('setup'); };
 })();
 </script>
 </body>
